@@ -528,17 +528,23 @@ public class FacebookCrawlerMain {
         DateTimeFormatter[] formats = new DateTimeFormatter[]{
             fullFormatter, missingYearFormatter, missingTimeFormatter, dayMonthFormatter
         };
-        for (int i = 0; date==null; ++i) {
-            DateTimeFormatter formatter = formats[i];
-            try {
-                date = formatter.parseDateTime(dateString);
-            } catch (java.lang.IllegalArgumentException ex) {
-            
-            }
-            if (formatter == missingYearFormatter || formatter == dayMonthFormatter) {
-                date = date.withYear(DateTime.now().getYear());
-            }
-        }
+		int i = 0;
+		try{
+			while ( date==null ) {
+				DateTimeFormatter formatter = formats[i];
+				try {
+					date = formatter.parseDateTime(dateString);
+					if (((formatter == missingYearFormatter) || (formatter == dayMonthFormatter))&&(date != null)) {
+						date = date.withYear(DateTime.now().getYear());
+					}
+				} catch (java.lang.IllegalArgumentException ex) {
+				
+				}
+				++i;
+			}
+        }catch (java.lang.ArrayIndexOutOfBoundsException ex) {
+			throw new java.lang.UnsupportedOperationException("Unable to parse date: "+dateString);
+		}
         return date;
     }
 }

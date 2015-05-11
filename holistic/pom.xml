@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>edu.agh</groupId>
+    <artifactId>holistic</artifactId>
+    <name>Janus Simple CRIO based Application</name>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>bundle</packaging>
+
+    <properties>
+        <janus.verion>1.0</janus.verion>
+        <felix.main.version>4.2.1</felix.main.version>
+        <felix.gogo.command.version>0.12.0</felix.gogo.command.version>
+        <felix.gogo.shell.version>0.10.0</felix.gogo.shell.version>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <configuration>
+                    <instructions>
+                        <Bundle-Activator>edu.agh.Activator</Bundle-Activator>
+                    </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.janus-project.maven</groupId>
+                <artifactId>janus-maven-plugin</artifactId>
+                <version>${janus.verion}</version>
+                <configuration>
+                    <layout>felix</layout>
+                    <!-- The launcher will instantiate a OSGi Platform -->
+                    <launcher>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>org.apache.felix.main</artifactId>
+                        <version>${felix.main.version}</version>
+                    </launcher>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>1.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>edu.agh.Main</mainClass>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>org.janus-project.maven</id>
+            <name>Janus Project Snapshots</name>
+            <url>http://www.janus-project.org/maven/</url>
+        </repository>
+        <repository>
+            <id>apache-maven</id>
+            <name>Apache Maven</name>
+            <url>http://repo.maven.apache.org/maven2/</url>
+        </repository>
+        <repository>
+            <id>codehaus</id>
+            <name>Codehaus</name>
+            <url>http://repository.codehaus.org/</url>
+        </repository>
+        <repository>
+            <id>gephi-snapshots</id>
+            <name>Gephi Snapshots</name>
+            <url>http://nexus.gephi.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+        <repository>
+            <id>gephi-releases</id>
+            <name>Gephi Releases</name>
+            <url>http://nexus.gephi.org/nexus/content/repositories/releases/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>org.janus-project.maven</id>
+            <name>Janus Project Snapshots</name>
+            <url>http://www.janus-project.org/maven/</url>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <dependencies>
+        <dependency>
+            <artifactId>janus-kernel</artifactId>
+            <groupId>org.janus-project.kernel</groupId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/kernel-1.0-with-dependencies.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>com.restfb</groupId>
+            <artifactId>restfb</artifactId>
+            <version>1.8.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>gephi-toolkit</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <!--dependency>
+         			<groupId>org.janus-project.kernel</groupId>
+         			<artifactId>osgi</artifactId>
+         			<version>${janus.verion}</version>
+      		</dependency>
+      		<dependency>
+         			<groupId>org.janus-project.kernel</groupId>
+         			<artifactId>network</artifactId>
+         			<version>${janus.verion}</version>
+      		</dependency -->
+        <!-- Uncomment these dependencies if you what to use the osgi shell. Remember 
+     			that if you include them they will be included in you final application distribution 
+     			zip, then increasing your application footprint. -->
+        <!-- 
+      		<dependency>
+         			<groupId>org.apache.felix</groupId>
+         			<artifactId>org.apache.felix.gogo.command</artifactId>
+         			<version>${felix.gogo.command.version}</version>
+      		</dependency>
+      		<dependency>
+         			<groupId>org.apache.felix</groupId>
+         			<artifactId>org.apache.felix.gogo.shell</artifactId>
+         			<version>${felix.gogo.shell.version}</version>
+      		</dependency>
+      		-->
+        <!--dependency>
+         			<groupId>org.apache.felix</groupId>
+         			<artifactId>org.apache.felix.main</artifactId>
+         			<version>${felix.main.version}</version>
+         			<scope>provided</scope>
+      		</dependency-->
+        <!--dependency>
+            <groupId>org.janus-project.kernel</groupId>
+            <artifactId>osgi</artifactId>
+            <version>0.3</version>
+            <type>jar</type>
+            <exclusions>
+                <exclusion>
+                    <artifactId>arakhneVmutils</artifactId>
+                    <groupId>org.arakhne.afc</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency-->
+        <dependency>
+            <groupId>org.janus-project.kernel</groupId>
+            <artifactId>osgi</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.2.4</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.2.5</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.6.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.35</version>
+        </dependency>
+    </dependencies>
+</project>

@@ -1,0 +1,1 @@
+type .\creatioin_05_09.sql | E:\instalki\mysql-5.6.12-winx64\bin\mysql.exe -u crawler -p

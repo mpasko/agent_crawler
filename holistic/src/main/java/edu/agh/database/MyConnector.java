@@ -12,7 +12,6 @@ import java.sql.SQLException;
 import java.util.AbstractMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 import org.joda.time.DateTime;
@@ -41,8 +40,9 @@ public class MyConnector {
     }
 
     public void putUser(String link, int id) {
+        PreparedStatement statement=null;
         try {
-            PreparedStatement statement = connect
+            statement = connect
                 .prepareStatement("insert into Osoba(id, nazwa, link) values (?, ?, ?)");
             // "myuser, webpage, datum, summery, COMMENTS from feedback.comments");
             // Parameters start with 1
@@ -53,6 +53,8 @@ public class MyConnector {
             statement.close();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
         }
     }
 
@@ -84,10 +86,11 @@ public class MyConnector {
         if (content == null) {
             return;
         }
+        PreparedStatement statement = null;
         try {
             String query = "insert into Interakcja(id, z_kim, czas, Osoba_id) values (default, ?, ?, ?)";
             //throw new UnsupportedOperationException("Not yet implemented");
-            PreparedStatement statement = connect.prepareStatement(query);
+            statement = connect.prepareStatement(query);
             for (Entry<String, String> friend : content.entrySet()) {
                 statement.setString(1, friend.getValue());
                 statement.setDate(2, new java.sql.Date(date.toDate().getTime()));
@@ -98,6 +101,8 @@ public class MyConnector {
             statement.close();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
         }
     }
 
@@ -105,10 +110,10 @@ public class MyConnector {
         if (items == null) {
             return;
         }
+        PreparedStatement statement=null;
         try {
-            String query = String.format("insert into %s(id, nazwa, link, Osoba_id) values (default, ?, ?, ?) ", table);
-            //throw new UnsupportedOperationException("Not yet implemented");
-            PreparedStatement statement = connect.prepareStatement(query);
+            final String query = String.format("insert into %s(id, nazwa, link, Osoba_id) values (default, ?, ?, ?) ", table);
+            statement = connect.prepareStatement(query);
             for (Entry<String, String> friend : items.entrySet()) {
                 statement.setString(1, friend.getKey());
                 statement.setString(2, friend.getValue());
@@ -119,6 +124,8 @@ public class MyConnector {
             statement.close();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
         }
     }
     
@@ -126,10 +133,11 @@ public class MyConnector {
         if (items == null) {
             return;
         }
+        PreparedStatement statement=null;
         try {
             String query = "insert into Miejsce(id, nazwa, link, typ, Osoba_id) values (default, ?, ?, ?, ?) ";
             //throw new UnsupportedOperationException("Not yet implemented");
-            PreparedStatement statement = connect.prepareStatement(query);
+            statement = connect.prepareStatement(query);
             for (Entry<String, String> friend : items.entrySet()) {
                 statement.setString(1, friend.getKey());
                 statement.setString(2, friend.getValue());
@@ -141,11 +149,15 @@ public class MyConnector {
             statement.close();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
         }
     }
     
     public List<Entry<Integer, Integer>> getFriends(){
         LinkedList<Entry<Integer, Integer>> friends = new LinkedList<Entry<Integer, Integer>>();
+        PreparedStatement statement=null;
+        ResultSet resultSet=null;
         try {
             String query = "select kto.id, komu.id "
                     + "from Osoba as kto "
@@ -153,18 +165,47 @@ public class MyConnector {
                     + "on kto.id = Przyjaciel.Osoba_id "
                     + "inner join Osoba as komu "
                     + "on Przyjaciel.link = komu.link;";
-            PreparedStatement statement = connect.prepareStatement(query);
-            ResultSet resultSet = statement.executeQuery();
+            statement = connect.prepareStatement(query);
+            resultSet = statement.executeQuery();
             while (resultSet.next()) {
                 Integer from = resultSet.getInt(1);
                 Integer to = resultSet.getInt(2);
                 friends.add(new AbstractMap.SimpleEntry<Integer, Integer>(from, to));
             }
-            resultSet.close();
-            statement.close();
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
+            closeResultSet(resultSet);
+        }
+        return friends;
+    }
+
+    public void close() {
+        try {
+            connect.close();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
         }
-        return friends;
+    }
+
+    private void closeStatement(PreparedStatement statement) {
+        if (statement!=null){
+            try {
+                statement.close();
+            } catch (SQLException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
+    }
+
+    private void closeResultSet(ResultSet resultSet) {
+        if (resultSet!=null){
+            try {
+                resultSet.close();
+            } catch (SQLException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
 }

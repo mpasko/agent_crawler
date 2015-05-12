@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -22,6 +23,7 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -37,6 +39,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.openide.util.Exceptions;
 
 /**
  *
@@ -59,16 +62,30 @@ public class FacebookCrawlerMain {
     private final DateTimeFormatter missingYearFormatter;
     private final DateTimeFormatter missingTimeFormatter;
     private final DateTimeFormatter dayMonthFormatter;
+    private final DateTimeFormatter singleMonthFormatter;
+    private final DateTimeFormatter monthYearFormatter;
+    private final CustomFormatter fewMinutesFormatter;
+    DateTimeFormatter[] formats;
+    private final Random random;
     
     public FacebookCrawlerMain() {
         httpclient = new DefaultHttpClient();
         namesToVerify = new LinkedList<String>();
         alredyVisited = new HashSet<String>();
         connector = new MyConnector();
+        random = new Random();
         fullFormatter = DateTimeFormat.forPattern("dd MMMM yyyy 'at' HH:mm");
         missingYearFormatter = DateTimeFormat.forPattern("dd MMMM 'at' HH:mm");
         missingTimeFormatter = DateTimeFormat.forPattern("dd MMMM yyyy");
-        dayMonthFormatter = DateTimeFormat.forPattern("dd MMMM yyyy");
+        dayMonthFormatter = DateTimeFormat.forPattern("dd MMMM");
+        singleMonthFormatter = DateTimeFormat.forPattern("MMMM");
+        monthYearFormatter = DateTimeFormat.forPattern("MMMM yyyy");
+        fewMinutesFormatter = new CustomFormatter();
+        formats = new DateTimeFormatter[]{
+            fullFormatter, missingYearFormatter, missingTimeFormatter,
+            dayMonthFormatter, singleMonthFormatter, monthYearFormatter,
+            fewMinutesFormatter
+        };
     }
 
     public static void main(String[] args) throws Exception {
@@ -100,8 +117,8 @@ public class FacebookCrawlerMain {
         }
         httpost = new HttpPost("http://www.facebook.com/login.php");
         nvps = new ArrayList<NameValuePair>();
-        nvps.add(new BasicNameValuePair("email", "a2686248@trbvm.com"));
-        nvps.add(new BasicNameValuePair("pass", "cheos2"));
+        nvps.add(new BasicNameValuePair("email", "krismiechowski333@gmail.com"));
+        nvps.add(new BasicNameValuePair("pass", "kmiechowski333"));
 
         entity.getContent().close();
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
@@ -124,10 +141,24 @@ public class FacebookCrawlerMain {
         entity.getContent().close();
     }
 
+    public void logOut() {
+        try {
+            Document doc = fetchDocument("http://m.facebook.com");
+            Element logoutLink = allElementsByTagText(doc, "a", "Log Out").get(0);
+            String url = String.format("https://m.facebook.com%s", logoutLink.attr("href"));
+            System.out.println(url);
+            httpclient.execute(new HttpGet(url));
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        } catch (InterruptedException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+    }
+        
     public Document fetchDocument(final String url) throws IllegalStateException, IOException, ParseException, InterruptedException {
         /* */
         //To perform crawling culture ;)
-        Thread.sleep(10);
+        Thread.sleep(50+random.nextInt(150));
         HttpGet nw = new HttpGet(url);
         //System.out.println(String.format("Connecting with: %s", url));
         response = httpclient.execute(nw);
@@ -146,10 +177,7 @@ public class FacebookCrawlerMain {
              String idarray[] = new String[]{"100006273318136"};
              /* */
             String idarray[] = new String[]{
-                //"profile.php?id=100007856622129&", 
                 "majka.jedrzejewicz?"
-                //,"mikeshinoda?",
-                //"profile.php?100000652381795&"
             };
             /* */
             int k = 0;
@@ -157,13 +185,17 @@ public class FacebookCrawlerMain {
                 final String userName = idarray[k];
                 analyzeUser(userName);
             }
-            int usersToInvigilate = 3;
+            int usersToInvigilate = 10000;
             for (k = 0; k < usersToInvigilate; ++k) {
                 String userName = namesToVerify.remove();
-                analyzeUser(userName);
+                try {
+                    analyzeUser(userName);
+                } catch (Throwable th) {
+                    Exceptions.printStackTrace(th);
+                }
             }
         } finally {
-            httpclient.getConnectionManager().shutdown();
+            closeAll();
         }
     }
     
@@ -177,34 +209,35 @@ public class FacebookCrawlerMain {
         /* */
         TreeMap<String, String> friends = analyzeFriends(userName);
         connector.putFriends(id, friends);
-        //printMap(friends, "friend");
         for (Entry<String, String> entry : friends.entrySet()) {
             String userid = entry.getValue();
             if (!alredyVisited.contains(userid)&&!namesToVerify.contains(userid)) {
                 namesToVerify.add(userid);
             }
         }
+        
         TreeMap<String, String> likes = analyzeLikes(userName);
         connector.putLikes(id, likes);
-        //printMap(likes, "like");
+        
         TreeMap<String, String> timeline = analyzeTimeline(userName);
         //printMap(timeline, "timeline item");
+        
         for (Entry<String, String> entry : timeline.entrySet()) {
             String timelineUrl = entry.getValue();
             TreeMap<String, String> content = analyzeTimelineContent(timelineUrl);
-            connector.putTimeline(id, parseDate(entry.getKey()), content);
-            //printMap(content, "content item");
+            DateTime parsedDate = parseDate(entry.getKey());
+            System.out.println("date: "+parsedDate.toString());
+            connector.putTimeline(id, parsedDate, content);
         }
+        
         Document doc = fetchDocument(url);
         TreeMap<String, String> living = analyzeTopic(doc, "living");
         connector.putLiving(id, living);
-        //printMap(living, "living item");
         TreeMap<String, String> work = analyzeTopic(doc, "work");
         connector.putWork(id, work);
-        //printMap(work, "work item");
         TreeMap<String, String> edu = analyzeTopic(doc, "education");
         connector.putEdu(id, edu);
-        //printMap(edu, "education item");
+        
         alredyVisited.add(userName);
         ++id;
     }
@@ -419,8 +452,11 @@ public class FacebookCrawlerMain {
         LinkedList<String> keywords = new LinkedList<String>();
         keywords.add("\\/");
         keywords.add("fref=fr_tab");
+        keywords.add("fref=pb");
         keywords.add("fref=none");
         keywords.add("refid=17");
+        keywords.add("fref=*");
+        keywords.add("refid=*");
         //keywords.add("profile\\.php");
         String result = linkurl;
         for (String key : keywords) {
@@ -439,6 +475,10 @@ public class FacebookCrawlerMain {
     public Element findElementByIdTagText(Document doc, String parentId, String tag, String text) {
         Element moreItems = null;
         Element composer = doc.getElementById(parentId);
+        if (composer==null) {
+            System.out.println("[WARNING] null "+parentId+" !!!");
+            return null;
+        }
         Elements compLinks = composer.getElementsByTag(tag);
         for (Element link : compLinks) {
             if (link.text().equalsIgnoreCase(text)){
@@ -462,7 +502,7 @@ public class FacebookCrawlerMain {
         LinkedList<Element> moreItems = new LinkedList<Element>();
         Elements compLinks = element.getElementsByTag(tag);
         for (Element link : compLinks) {
-            if (link.text().equalsIgnoreCase(text)){
+            if (link.text().equalsIgnoreCase(text) || link.text().contains(text)){
                 moreItems.add(link);
             }
         }
@@ -523,28 +563,31 @@ public class FacebookCrawlerMain {
         return likes;
     }
 
+    @SuppressWarnings("DeadStoreToLocal")
     public DateTime parseDate(String dateString) {
         DateTime date = null;
-        DateTimeFormatter[] formats = new DateTimeFormatter[]{
-            fullFormatter, missingYearFormatter, missingTimeFormatter, dayMonthFormatter
-        };
 		int i = 0;
-		try{
-			while ( date==null ) {
-				DateTimeFormatter formatter = formats[i];
-				try {
-					date = formatter.parseDateTime(dateString);
-					if (((formatter == missingYearFormatter) || (formatter == dayMonthFormatter))&&(date != null)) {
-						date = date.withYear(DateTime.now().getYear());
-					}
-				} catch (java.lang.IllegalArgumentException ex) {
-				
-				}
-				++i;
-			}
-        }catch (java.lang.ArrayIndexOutOfBoundsException ex) {
-			throw new java.lang.UnsupportedOperationException("Unable to parse date: "+dateString);
-		}
+        while ( date==null ) {
+            DateTimeFormatter formatter = formats[i];
+            try {
+                date = formatter.parseDateTime(dateString);
+                if (((formatter == missingYearFormatter) || (formatter == dayMonthFormatter))&&(date != null)) {
+                    date = date.withYear(DateTime.now().getYear());
+                }
+            } catch (java.lang.IllegalArgumentException ex) {
+
+            }
+            ++i;
+            if (i>=formats.length) {
+                throw new java.lang.UnsupportedOperationException("Unable to parse date: "+dateString);
+            }
+        }
         return date;
+    }
+
+    public void closeAll() {
+        logOut();
+        httpclient.getConnectionManager().shutdown();
+        connector.close();
     }
 }

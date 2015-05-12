@@ -4,6 +4,7 @@
  */
 package edu.agh.database;
 
+import edu.agh.manualutils.PrinterUtil;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -123,6 +124,7 @@ public class MyConnector {
             statement.executeBatch();
             statement.close();
         } catch (SQLException ex) {
+            PrinterUtil.printMap(items, "MyConnector.putItems");
             Exceptions.printStackTrace(ex);
         } finally {
             closeStatement(statement);

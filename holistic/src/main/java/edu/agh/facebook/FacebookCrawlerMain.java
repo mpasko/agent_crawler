@@ -226,7 +226,7 @@ public class FacebookCrawlerMain {
             String timelineUrl = entry.getValue();
             TreeMap<String, String> content = analyzeTimelineContent(timelineUrl);
             DateTime parsedDate = parseDate(entry.getKey());
-            System.out.println("date: "+parsedDate.toString());
+            //System.out.println("date: "+parsedDate.toString());
             connector.putTimeline(id, parsedDate, content);
         }
         
@@ -516,14 +516,6 @@ public class FacebookCrawlerMain {
             moreItems.addAll(tags);
         }
         return moreItems;
-    }
-
-    public void printMap(TreeMap<String, String> likes, String text) {
-        for (Entry<String, String> entry:likes.entrySet()) {
-            String like = entry.getKey();
-            String link = entry.getValue();
-            System.out.println(String.format("Next %s: name:%s id:%s", text, like, link));
-        }
     }
 
     private TreeMap<String, String> getStoryLikes(Document doc) throws IllegalStateException, IOException, ParseException, InterruptedException {

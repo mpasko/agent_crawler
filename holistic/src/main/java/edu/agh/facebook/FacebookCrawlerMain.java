@@ -57,16 +57,8 @@ public class FacebookCrawlerMain {
     Queue<String> namesToVerify;
     Set<String> alredyVisited;
     private final MyConnector connector;
-    
-    private final DateTimeFormatter fullFormatter;
-    private final DateTimeFormatter missingYearFormatter;
-    private final DateTimeFormatter missingTimeFormatter;
-    private final DateTimeFormatter dayMonthFormatter;
-    private final DateTimeFormatter singleMonthFormatter;
-    private final DateTimeFormatter monthYearFormatter;
-    private final CustomFormatter fewMinutesFormatter;
-    DateTimeFormatter[] formats;
     private final Random random;
+    private DateParser dateParser;
     
     public FacebookCrawlerMain() {
         httpclient = new DefaultHttpClient();
@@ -74,18 +66,7 @@ public class FacebookCrawlerMain {
         alredyVisited = new HashSet<String>();
         connector = new MyConnector();
         random = new Random();
-        fullFormatter = DateTimeFormat.forPattern("dd MMMM yyyy 'at' HH:mm");
-        missingYearFormatter = DateTimeFormat.forPattern("dd MMMM 'at' HH:mm");
-        missingTimeFormatter = DateTimeFormat.forPattern("dd MMMM yyyy");
-        dayMonthFormatter = DateTimeFormat.forPattern("dd MMMM");
-        singleMonthFormatter = DateTimeFormat.forPattern("MMMM");
-        monthYearFormatter = DateTimeFormat.forPattern("MMMM yyyy");
-        fewMinutesFormatter = new CustomFormatter();
-        formats = new DateTimeFormatter[]{
-            fullFormatter, missingYearFormatter, missingTimeFormatter,
-            dayMonthFormatter, singleMonthFormatter, monthYearFormatter,
-            fewMinutesFormatter
-        };
+        dateParser = new DateParser();
     }
 
     public static void main(String[] args) throws Exception {
@@ -225,7 +206,7 @@ public class FacebookCrawlerMain {
         for (Entry<String, String> entry : timeline.entrySet()) {
             String timelineUrl = entry.getValue();
             TreeMap<String, String> content = analyzeTimelineContent(timelineUrl);
-            DateTime parsedDate = parseDate(entry.getKey());
+            DateTime parsedDate = dateParser.parseDate(entry.getKey());
             //System.out.println("date: "+parsedDate.toString());
             connector.putTimeline(id, parsedDate, content);
         }
@@ -553,28 +534,6 @@ public class FacebookCrawlerMain {
             likes.putAll(nextPortion);
         }
         return likes;
-    }
-
-    @SuppressWarnings("DeadStoreToLocal")
-    public DateTime parseDate(String dateString) {
-        DateTime date = null;
-		int i = 0;
-        while ( date==null ) {
-            DateTimeFormatter formatter = formats[i];
-            try {
-                date = formatter.parseDateTime(dateString);
-                if (((formatter == missingYearFormatter) || (formatter == dayMonthFormatter))&&(date != null)) {
-                    date = date.withYear(DateTime.now().getYear());
-                }
-            } catch (java.lang.IllegalArgumentException ex) {
-
-            }
-            ++i;
-            if (i>=formats.length) {
-                throw new java.lang.UnsupportedOperationException("Unable to parse date: "+dateString);
-            }
-        }
-        return date;
     }
 
     public void closeAll() {

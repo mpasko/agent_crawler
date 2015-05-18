@@ -82,7 +82,7 @@ public class TwitterCrawler {
 			String[] startScreens = new String[]{"Karola0601", "DariaBladzinska"};
 			
 			for (int i=0; i<startScreens.length; ++i) {
-				User startUser = twitter.showUser(startScreens[i]);
+				User startUser = PageableFetcher.wrapShowUser(twitter,startScreens[i]);
 				examineUser(twitter, startUser);
 			}
         }
@@ -197,7 +197,7 @@ public class TwitterCrawler {
     private void examineNextPortionOfFriends() throws TwitterException {
         List<String> nextUsers = connect.getUsersToExamine();
         for (String screen : nextUsers) {
-            User nextUser = twitter.showUser(screen);
+            User nextUser = PageableFetcher.wrapShowUser(twitter, screen);
             int followersCount = nextUser.getFollowersCount();
             int friendsCount = nextUser.getFriendsCount();
             boolean isCelebrity = (followersCount>300)||(friendsCount>500);

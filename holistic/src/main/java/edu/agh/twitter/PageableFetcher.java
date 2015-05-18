@@ -22,6 +22,20 @@ public abstract class PageableFetcher <T extends TwitterResponse>{
     private static final int MAX_RETRIES = 5;
     private static boolean retry;
     private static int consecutiveErrors = 0;
+
+    public static User wrapShowUser(Twitter twitter, String userScreen) {
+        User user = null;
+        do{
+            retry = false;
+            try {
+                user = twitter.showUser(userScreen);
+            } catch (TwitterException ex) {
+                retry = true;
+                handleTwitterException(ex);
+            }
+        } while (retry);
+        return user;
+    }
     
     public LinkedList<T> fetch(Twitter twitter, String userScreen) {
         LinkedList<T> friendIds = new LinkedList<T>();

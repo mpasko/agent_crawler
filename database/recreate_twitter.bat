@@ -1,0 +1,1 @@
+type creation_twitter_05_17.sql | E:\instalki\mysql-5.6.12-winx64\bin\mysql.exe -u crawler -p

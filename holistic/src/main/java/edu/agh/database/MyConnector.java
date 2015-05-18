@@ -26,13 +26,13 @@ public class MyConnector {
 
     public static void main(String[] args) {
     }
-    private Connection connect = null;
+    protected Connection connect = null;
 
-    public MyConnector() {
+    public MyConnector(String dbname) {
         try {
             Class.forName("com.mysql.jdbc.Driver");
-            connect = DriverManager.getConnection("jdbc:mysql://localhost/mydb?"
-                    + "user=crawler&password=crawler");
+            String connectionString = String.format("jdbc:mysql://localhost/%s?user=crawler&password=crawler", dbname);
+            connect = DriverManager.getConnection(connectionString);
         } catch (ClassNotFoundException ex) {
             Exceptions.printStackTrace(ex);
         } catch (SQLException ex) {
@@ -182,6 +182,19 @@ public class MyConnector {
         }
         return friends;
     }
+    
+    
+    public int getMaxOsobaId() {
+        String query = "select max(id) from Osoba;";
+        int result = getSingleValue(query);
+        return result;
+    }
+    
+    public int getCrawledSoFar() {
+        String query = "select count(id) from Osoba;";
+        int result = getSingleValue(query);
+        return result;
+    }
 
     public void close() {
         try {
@@ -191,7 +204,7 @@ public class MyConnector {
         }
     }
 
-    private void closeStatement(PreparedStatement statement) {
+    protected void closeStatement(PreparedStatement statement) {
         if (statement!=null){
             try {
                 statement.close();
@@ -201,7 +214,7 @@ public class MyConnector {
         }
     }
 
-    private void closeResultSet(ResultSet resultSet) {
+    protected void closeResultSet(ResultSet resultSet) {
         if (resultSet!=null){
             try {
                 resultSet.close();
@@ -209,5 +222,49 @@ public class MyConnector {
                 Exceptions.printStackTrace(ex);
             }
         }
+    }
+
+    private int getSingleValue(String query) {
+        PreparedStatement statement=null;
+        ResultSet resultSet=null;
+        int result=-1;
+        try {
+            statement = connect.prepareStatement(query);
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                result = resultSet.getInt(1);
+            }
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
+            closeResultSet(resultSet);
+        }
+        return result;
+    }
+
+    public List<String> getUsersToExamine() {
+        LinkedList<String> friends = new LinkedList<String>();
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            String query = "select distinct(Przyjaciel.link) " + 
+                    "from Przyjaciel " + 
+                    "left outer join Osoba " + 
+                    "on Przyjaciel.link = Osoba.link " + 
+                    "where Osoba.link is NULL;";
+            statement = connect.prepareStatement(query);
+            resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                String next = resultSet.getString(1);
+                friends.add(next);
+            }
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
+            closeResultSet(resultSet);
+        }
+        return friends;
     }
 }

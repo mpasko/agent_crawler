@@ -18,12 +18,10 @@ import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -33,8 +31,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -54,17 +50,17 @@ public class FacebookCrawlerMain {
     List<Cookie> cookies;
     HttpPost httpost;
     List<NameValuePair> nvps;
-    Queue<String> namesToVerify;
-    Set<String> alredyVisited;
+    //Queue<String> namesToVerify;
+    //Set<String> alredyVisited;
     private final MyConnector connector;
     private final Random random;
     private DateParser dateParser;
     
     public FacebookCrawlerMain() {
         httpclient = new DefaultHttpClient();
-        namesToVerify = new LinkedList<String>();
-        alredyVisited = new HashSet<String>();
-        connector = new MyConnector();
+        //namesToVerify = new LinkedList<String>();
+        //alredyVisited = new HashSet<String>();
+        connector = new MyConnector("mydb");
         random = new Random();
         dateParser = new DateParser();
     }
@@ -157,23 +153,19 @@ public class FacebookCrawlerMain {
             /* * /
              String idarray[] = new String[]{"100006273318136"};
              /* */
-            String idarray[] = new String[]{
-                "majka.jedrzejewicz?"
-            };
+            
             /* */
-            int k = 0;
-            for (k = 0; k < idarray.length; ++k) {
-                final String userName = idarray[k];
-                analyzeUser(userName);
-            }
             int usersToInvigilate = 10000;
-            for (k = 0; k < usersToInvigilate; ++k) {
-                String userName = namesToVerify.remove();
-                try {
-                    analyzeUser(userName);
-                } catch (Throwable th) {
-                    Exceptions.printStackTrace(th);
+            while (usersToInvigilate>0){
+                List<String> idArray = connector.getUsersToExamine();
+                for (String userName:idArray) {
+                    try {
+                        analyzeUser(userName);
+                    } catch (Throwable th) {
+                        Exceptions.printStackTrace(th);
+                    }
                 }
+                usersToInvigilate-=idArray.size();
             }
         } finally {
             closeAll();
@@ -192,9 +184,9 @@ public class FacebookCrawlerMain {
         connector.putFriends(id, friends);
         for (Entry<String, String> entry : friends.entrySet()) {
             String userid = entry.getValue();
-            if (!alredyVisited.contains(userid)&&!namesToVerify.contains(userid)) {
-                namesToVerify.add(userid);
-            }
+            //if (!alredyVisited.contains(userid)&&!namesToVerify.contains(userid)) {
+            //    namesToVerify.add(userid);
+            //}
         }
         
         TreeMap<String, String> likes = analyzeLikes(userName);
@@ -219,7 +211,7 @@ public class FacebookCrawlerMain {
         TreeMap<String, String> edu = analyzeTopic(doc, "education");
         connector.putEdu(id, edu);
         
-        alredyVisited.add(userName);
+        //alredyVisited.add(userName);
         ++id;
     }
 

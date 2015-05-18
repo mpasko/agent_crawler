@@ -46,7 +46,7 @@ public class GephiMain {
             n0.setLabel("Node "+i);
             nodes.add(i, n0);
         }
-        MyConnector connect = new MyConnector();
+        MyConnector connect = new MyConnector("mydb");
         for (Entry<Integer, Integer> entry: connect.getFriends()) {
             Node n0 = nodes.get(entry.getKey());
             Node n1 = nodes.get(entry.getValue());

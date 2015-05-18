@@ -35,11 +35,11 @@ import twitter4j.conf.ConfigurationBuilder;
  * @author marcin
  */
 public class TwitterCrawler {
-    
+
     public static void main(String args[]) {
         try {
             TwitterCrawler crawler = new TwitterCrawler();
-			crawler.doJob();
+            crawler.doJob();
         } catch (TwitterException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -55,10 +55,10 @@ public class TwitterCrawler {
     public TwitterCrawler() {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
-            .setOAuthConsumerKey(SecretProvider.CONSUMER_KEY)
-            .setOAuthConsumerSecret(SecretProvider.CONSUMER_KEY_SECRET)
-            .setOAuthAccessToken(SecretProvider.ACCESS_TOKEN)
-            .setOAuthAccessTokenSecret(SecretProvider.ACCESS_TOKEN_SECRET);
+                .setOAuthConsumerKey(SecretProvider.CONSUMER_KEY)
+                .setOAuthConsumerSecret(SecretProvider.CONSUMER_KEY_SECRET)
+                .setOAuthAccessToken(SecretProvider.ACCESS_TOKEN)
+                .setOAuthAccessTokenSecret(SecretProvider.ACCESS_TOKEN_SECRET);
         TwitterFactory tf = new TwitterFactory(cb.build());
         twitter = tf.getInstance();
         friendsFetcher = new FriendsFetcher();
@@ -66,30 +66,30 @@ public class TwitterCrawler {
         membershipFetcher = new MembershipFetcher();
         subscriptionFetcher = new SubscriptionFetcher();
         timelineFetcher = new TimelineFetcher();
-		System.out.println("Connected to Twitter");
-        
+        System.out.println("Connected to Twitter");
+
         connect = new TwitterConnector();
-		System.out.println("Connected to Database");
+        System.out.println("Connected to Database");
     }
-    
+
     public void doJob() throws TwitterException {
-		System.out.println("Starting crawling");
-        userId = connect.getMaxOsobaId()+1;
-        
-		System.out.println("Starting with:"+userId);
-        if (userId==0) {
-			System.out.println("No users found -initializing");
-			String[] startScreens = new String[]{"Karola0601", "DariaBladzinska"};
-			
-			for (int i=0; i<startScreens.length; ++i) {
-				User startUser = PageableFetcher.wrapShowUser(twitter,startScreens[i]);
-				examineUser(twitter, startUser);
-			}
+        System.out.println("Starting crawling");
+        userId = connect.getMaxOsobaId() + 1;
+
+        System.out.println("Starting with:" + userId);
+        if (userId == 1) {
+            System.out.println("No users found -initializing");
+            String[] startScreens = new String[]{"KarolinaOchmanx", "DariaBladzinska"};
+
+            for (int i = 0; i < startScreens.length; ++i) {
+                User startUser = PageableFetcher.wrapShowUser(twitter, startScreens[i]);
+                examineUser(twitter, startUser);
+            }
         }
-        
-		do {
-			examineNextPortionOfFriends();
-		} while (true);
+
+        do {
+            examineNextPortionOfFriends();
+        } while (true);
     }
 
     public void printUser(User friend) {
@@ -106,10 +106,10 @@ public class TwitterCrawler {
         System.out.println(build.toString());
     }
 
-    static int userId=0;
+    static int userId = 0;
 
     private void examineUser(Twitter twitter, User user) {
-        System.out.println("Examining: "+ user.getName());
+        System.out.println("Examining: " + user.getName());
         connect.putTwitterUser(userId, user.getScreenName(), user.getName(), user.getLocation());
         LinkedList<User> friendIds = friendsFetcher.fetch(twitter, user.getScreenName());
         System.out.println("FRIENDS:");
@@ -143,7 +143,7 @@ public class TwitterCrawler {
         System.out.println("TIMELINE");
         for (Status status : timeline) {
             TreeMap<String, String> tweets = examineStatus(status);
-            if (tweets!=null) {
+            if (tweets != null) {
                 connect.putTweetItems(tweets, userId, status.getCreatedAt());
             }
         }
@@ -151,7 +151,7 @@ public class TwitterCrawler {
     }
 
     private TreeMap<String, String> examineStatus(Status status) {
-        if (status==null) {
+        if (status == null) {
             return null;
         }
         TreeMap<String, String> tweets = new TreeMap<String, String>();
@@ -174,8 +174,8 @@ public class TwitterCrawler {
     }
 
     private PlaceStatus verifyLocation(String location) {
-        if (location!=null && !location.isEmpty()){
-            GeoQuery geo = new GeoQuery((String)null);
+        if (location != null && !location.isEmpty()) {
+            GeoQuery geo = new GeoQuery((String) null);
             geo.setQuery(location);
             GeoLocation loc = geo.getLocation();
             if (loc == null) {
@@ -183,7 +183,7 @@ public class TwitterCrawler {
             }
             double latitude = loc.getLatitude();
             double longitude = loc.getLongitude();
-            boolean inPoland = (latitude>48) && (latitude<55.2) && (longitude>13.3) && (longitude<24.5);
+            boolean inPoland = (latitude > 48) && (latitude < 55.2) && (longitude > 13.3) && (longitude < 24.5);
             if (inPoland) {
                 return PlaceStatus.POLAND;
             } else {
@@ -200,18 +200,20 @@ public class TwitterCrawler {
             User nextUser = PageableFetcher.wrapShowUser(twitter, screen);
             int followersCount = nextUser.getFollowersCount();
             int friendsCount = nextUser.getFriendsCount();
-            boolean isCelebrity = (followersCount>300)||(friendsCount>500);
+            boolean isCelebrity = (followersCount > 300) || (friendsCount > 500);
             if (!isCelebrity) {
                 examineUser(twitter, nextUser);
             }
         }
     }
-    
-    private static enum PlaceStatus{
+
+    private static enum PlaceStatus {
+
         POLAND, OUTSIDE, INVALID;
     }
 
     private static class FriendsFetcher extends PageableFetcher<User> {
+
         @Override
         public PagableResponseList<User> twitterApiMethod(Twitter twitter, String userScreen, long cursor) throws TwitterException {
             return twitter.getFriendsList(userScreen, cursor);

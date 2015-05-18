@@ -54,8 +54,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>edu.agh.facebook.FacebookCrawlerMain</mainClass>
+                    <mainClass>edu.agh.facebook.TwitterCrawler</mainClass>
                 </configuration>
+				<!--
+				-->
             </plugin>
         </plugins>
     </build>

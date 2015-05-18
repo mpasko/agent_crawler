@@ -38,7 +38,8 @@ public class TwitterCrawler {
     
     public static void main(String args[]) {
         try {
-            new TwitterCrawler().run();
+            TwitterCrawler crawler = new TwitterCrawler();
+			crawler.doJob();
         } catch (TwitterException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -65,12 +66,30 @@ public class TwitterCrawler {
         membershipFetcher = new MembershipFetcher();
         subscriptionFetcher = new SubscriptionFetcher();
         timelineFetcher = new TimelineFetcher();
+		System.out.println("Connected to Twitter");
         
         connect = new TwitterConnector();
+		System.out.println("Connected to Database");
     }
     
-    public void run() throws TwitterException {
-        examineNextPortionOfFriends();
+    public void doJob() throws TwitterException {
+		System.out.println("Starting crawling");
+        userId = connect.getMaxOsobaId()+1;
+        
+		System.out.println("Starting with:"+userId);
+        if (userId==0) {
+			System.out.println("No users found -initializing");
+			String[] startScreens = new String[]{"Karola0601", "DariaBladzinska"};
+			
+			for (int i=0; i<startScreens.length; ++i) {
+				User startUser = twitter.showUser(startScreens[i]);
+				examineUser(twitter, startUser);
+			}
+        }
+        
+		do {
+			examineNextPortionOfFriends();
+		} while (true);
     }
 
     public void printUser(User friend) {
@@ -176,17 +195,6 @@ public class TwitterCrawler {
     }
 
     private void examineNextPortionOfFriends() throws TwitterException {
-        userId = connect.getMaxOsobaId()+1;
-        
-        /*
-        String[] startScreens = new String[]{"Karola0601", "Vera2121Ziba", "DariaBladzinska"};
-        
-        for (int i=0; i<startScreens.length; ++i) {
-            User startUser = twitter.showUser(startScreens[i]);
-            examineUser(twitter, startUser);
-        }
-        */
-        
         List<String> nextUsers = connect.getUsersToExamine();
         for (String screen : nextUsers) {
             User nextUser = twitter.showUser(screen);

@@ -94,12 +94,16 @@ public class FacebookCrawlerMain {
         }
         httpost = new HttpPost("http://www.facebook.com/login.php");
         nvps = new ArrayList<NameValuePair>();
+		/*
         nvps.add(new BasicNameValuePair("email", "krismiechowski333@gmail.com"));
         nvps.add(new BasicNameValuePair("pass", "kmiechowski333"));
-
+		*/
+		nvps.add(new BasicNameValuePair("email", "a2686248@trbvm.com"));
+        nvps.add(new BasicNameValuePair("pass", "cheos2"));
+		
         entity.getContent().close();
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-
+		httpost.setHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.3; WOW64; rv:37.0) Gecko/20100101 Firefox/37.0");
         response = httpclient.execute(httpost);
         entity = response.getEntity();
         System.out.println("Double check we've got right page " + EntityUtils.toString(entity));
@@ -135,7 +139,7 @@ public class FacebookCrawlerMain {
     public Document fetchDocument(final String url) throws IllegalStateException, IOException, ParseException, InterruptedException {
         /* */
         //To perform crawling culture ;)
-        Thread.sleep(50+random.nextInt(150));
+        Thread.sleep(1000+random.nextInt(1000));
         HttpGet nw = new HttpGet(url);
         //System.out.println(String.format("Connecting with: %s", url));
         response = httpclient.execute(nw);
@@ -155,6 +159,7 @@ public class FacebookCrawlerMain {
              /* */
             
             /* */
+			this.id = connector.getMaxOsobaId()+1;
             int usersToInvigilate = 10000;
             while (usersToInvigilate>0){
                 List<String> idArray = connector.getUsersToExamine();

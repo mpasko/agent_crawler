@@ -23,21 +23,21 @@ public abstract class PageableFetcher <T extends TwitterResponse>{
     private static boolean retry;
     private static int consecutiveErrors = 0;
 
-    public static User wrapShowUser(Twitter twitter, String userScreen) {
+    public static User wrapShowUser(TwitterConnectionHolder holder, String userScreen) {
         User user = null;
         do{
             retry = false;
             try {
-                user = twitter.showUser(userScreen);
+                user = holder.getTwitter().showUser(userScreen);
             } catch (TwitterException ex) {
                 retry = true;
-                handleTwitterException(ex);
+                handleTwitterException(holder, ex);
             }
         } while (retry);
         return user;
     }
     
-    public LinkedList<T> fetch(Twitter twitter, String userScreen) {
+    public LinkedList<T> fetch(TwitterConnectionHolder holder, String userScreen) {
         LinkedList<T> friendIds = new LinkedList<T>();
         long cursor=-1;
         PagableResponseList<T> friends = null;
@@ -45,10 +45,10 @@ public abstract class PageableFetcher <T extends TwitterResponse>{
             do{
                 retry = false;
                 try {
-                    friends = twitterApiMethod(twitter, userScreen, cursor);
+                    friends = twitterApiMethod(holder.getTwitter(), userScreen, cursor);
                 } catch (TwitterException ex) {
                     retry = true;
-                    handleTwitterException(ex);
+                    handleTwitterException(holder, ex);
                 }
             } while (retry);
             friendIds.addAll(friends);
@@ -57,7 +57,7 @@ public abstract class PageableFetcher <T extends TwitterResponse>{
         return friendIds;
     }
     
-    public static void handleTwitterException(TwitterException e) {
+    public static void handleTwitterException(TwitterConnectionHolder holder, TwitterException e) {
         if (e.exceededRateLimitation()) {
             int secondsToSleep = e.getRateLimitStatus().getSecondsUntilReset() + 1; // 1s slack
             int millisToSleep = 1000 * secondsToSleep;
@@ -73,11 +73,12 @@ public abstract class PageableFetcher <T extends TwitterResponse>{
             System.out.println("[" + new Date() + "] Woke up! Slept for " + (now - before) / 1000 + " seconds");
         } else {
             Exceptions.printStackTrace(e);
-            
+            holder.relogin();
+            /*
             if (consecutiveErrors++ > MAX_RETRIES) {
                 retry = false; // already tried enough
                 throw new RuntimeException(e);
-            }
+            }*/
         }
     }
 

@@ -24,16 +24,16 @@ public abstract class SimpleFetcher <T extends TwitterResponse>{
     private static boolean retry;
     private static int consecutiveErrors = 0;
     
-    public LinkedList<T> fetch(Twitter twitter, String userScreen) {
+    public LinkedList<T> fetch(TwitterConnectionHolder holder, String userScreen) {
         LinkedList<T> friendIds = new LinkedList<T>();
         ResponseList<T> friends = null;
         do{
             retry = false;
             try {
-                friends = twitterApiMethod(twitter, userScreen);
+                friends = twitterApiMethod(holder.getTwitter(), userScreen);
             } catch (TwitterException ex) {
                 retry = true;
-                PageableFetcher.handleTwitterException(ex);
+                PageableFetcher.handleTwitterException(holder, ex);
             }
         } while (retry);
         friendIds.addAll(friends);

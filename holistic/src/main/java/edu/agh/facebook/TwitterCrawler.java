@@ -8,6 +8,7 @@ import edu.agh.database.TwitterConnector;
 import edu.agh.twitter.PageableFetcher;
 import edu.agh.twitter.SecretProvider;
 import edu.agh.twitter.SimpleFetcher;
+import edu.agh.twitter.TwitterConnectionHolder;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,11 +52,11 @@ public class TwitterCrawler {
     private PageableFetcher<UserList> subscriptionFetcher;
     private SimpleFetcher<Status> timelineFetcher;
     private TwitterConnector connect;
-    private Twitter twitter;
-    private DateTime lastLogin;
+    private final TwitterConnectionHolder holder;
 
     public TwitterCrawler() {
-        relogin();
+        holder = new TwitterConnectionHolder();
+        holder.relogin();
         friendsFetcher = new FriendsFetcher();
         followersFetcher = new FollowersFetcher();
         membershipFetcher = new MembershipFetcher();
@@ -66,18 +67,6 @@ public class TwitterCrawler {
         System.out.println("Connected to Database");
     }
 
-    private void relogin() {
-        ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true)
-                .setOAuthConsumerKey(SecretProvider.CONSUMER_KEY)
-                .setOAuthConsumerSecret(SecretProvider.CONSUMER_KEY_SECRET)
-                .setOAuthAccessToken(SecretProvider.ACCESS_TOKEN)
-                .setOAuthAccessTokenSecret(SecretProvider.ACCESS_TOKEN_SECRET);
-        TwitterFactory tf = new TwitterFactory(cb.build());
-        twitter = tf.getInstance();
-        lastLogin = DateTime.now();
-        System.out.println("Connected to Twitter: "+lastLogin);
-    }
 
     public void doJob() throws TwitterException {
         System.out.println("Starting crawling: "+DateTime.now());
@@ -89,8 +78,8 @@ public class TwitterCrawler {
             String[] startScreens = new String[]{"KarolinaOchmanx", "DariaBladzinska"};
 
             for (int i = 0; i < startScreens.length; ++i) {
-                User startUser = PageableFetcher.wrapShowUser(twitter, startScreens[i]);
-                examineUser(twitter, startUser);
+                User startUser = PageableFetcher.wrapShowUser(holder, startScreens[i]);
+                examineUser(holder, startUser);
             }
         }
 
@@ -115,7 +104,7 @@ public class TwitterCrawler {
 
     static int userId = 0;
 
-    private void examineUser(Twitter twitter, User user) {
+    private void examineUser(TwitterConnectionHolder twitter, User user) {
         System.out.println("Examining: " + user.getName());
         connect.putTwitterUser(userId, user.getScreenName(), user.getName(), user.getLocation());
         LinkedList<User> friendIds = friendsFetcher.fetch(twitter, user.getScreenName());
@@ -204,22 +193,17 @@ public class TwitterCrawler {
     private void examineNextPortionOfFriends() throws TwitterException {
         List<String> nextUsers = connect.getUsersToExamine();
         for (String screen : nextUsers) {
-            reloginIfNeeded();
-            User nextUser = PageableFetcher.wrapShowUser(twitter, screen);
+            holder.reloginIfNeeded();
+            User nextUser = PageableFetcher.wrapShowUser(holder, screen);
             int followersCount = nextUser.getFollowersCount();
             int friendsCount = nextUser.getFriendsCount();
             boolean isCelebrity = (followersCount > 300) || (friendsCount > 500);
             if (!isCelebrity) {
-                examineUser(twitter, nextUser);
+                examineUser(holder, nextUser);
             }
         }
     }
 
-    private void reloginIfNeeded() {
-        if(DateTime.now().getMinuteOfDay()-lastLogin.getMinuteOfDay()>30) {
-            relogin();
-        }
-    }
 
     private static enum PlaceStatus {
         POLAND, OUTSIDE, INVALID;

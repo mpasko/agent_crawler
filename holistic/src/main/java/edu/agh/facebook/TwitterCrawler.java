@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
+import org.joda.time.DateTime;
 import org.openide.util.Exceptions;
 import twitter4j.GeoLocation;
 import twitter4j.GeoQuery;
@@ -51,8 +52,21 @@ public class TwitterCrawler {
     private SimpleFetcher<Status> timelineFetcher;
     private TwitterConnector connect;
     private Twitter twitter;
+    private DateTime lastLogin;
 
     public TwitterCrawler() {
+        relogin();
+        friendsFetcher = new FriendsFetcher();
+        followersFetcher = new FollowersFetcher();
+        membershipFetcher = new MembershipFetcher();
+        subscriptionFetcher = new SubscriptionFetcher();
+        timelineFetcher = new TimelineFetcher();
+
+        connect = new TwitterConnector();
+        System.out.println("Connected to Database");
+    }
+
+    private void relogin() {
         ConfigurationBuilder cb = new ConfigurationBuilder();
         cb.setDebugEnabled(true)
                 .setOAuthConsumerKey(SecretProvider.CONSUMER_KEY)
@@ -61,19 +75,12 @@ public class TwitterCrawler {
                 .setOAuthAccessTokenSecret(SecretProvider.ACCESS_TOKEN_SECRET);
         TwitterFactory tf = new TwitterFactory(cb.build());
         twitter = tf.getInstance();
-        friendsFetcher = new FriendsFetcher();
-        followersFetcher = new FollowersFetcher();
-        membershipFetcher = new MembershipFetcher();
-        subscriptionFetcher = new SubscriptionFetcher();
-        timelineFetcher = new TimelineFetcher();
-        System.out.println("Connected to Twitter");
-
-        connect = new TwitterConnector();
-        System.out.println("Connected to Database");
+        lastLogin = DateTime.now();
+        System.out.println("Connected to Twitter: "+lastLogin);
     }
 
     public void doJob() throws TwitterException {
-        System.out.println("Starting crawling");
+        System.out.println("Starting crawling: "+DateTime.now());
         userId = connect.getMaxOsobaId() + 1;
 
         System.out.println("Starting with:" + userId);
@@ -197,6 +204,7 @@ public class TwitterCrawler {
     private void examineNextPortionOfFriends() throws TwitterException {
         List<String> nextUsers = connect.getUsersToExamine();
         for (String screen : nextUsers) {
+            reloginIfNeeded();
             User nextUser = PageableFetcher.wrapShowUser(twitter, screen);
             int followersCount = nextUser.getFollowersCount();
             int friendsCount = nextUser.getFriendsCount();
@@ -207,8 +215,13 @@ public class TwitterCrawler {
         }
     }
 
-    private static enum PlaceStatus {
+    private void reloginIfNeeded() {
+        if(DateTime.now().getMinuteOfDay()-lastLogin.getMinuteOfDay()>30) {
+            relogin();
+        }
+    }
 
+    private static enum PlaceStatus {
         POLAND, OUTSIDE, INVALID;
     }
 

@@ -73,12 +73,11 @@ public abstract class PageableFetcher <T extends TwitterResponse>{
             System.out.println("[" + new Date() + "] Woke up! Slept for " + (now - before) / 1000 + " seconds");
         } else {
             Exceptions.printStackTrace(e);
-            holder.relogin();
-            /*
             if (consecutiveErrors++ > MAX_RETRIES) {
                 retry = false; // already tried enough
                 throw new RuntimeException(e);
-            }*/
+            }
+            holder.relogin();
         }
     }
 

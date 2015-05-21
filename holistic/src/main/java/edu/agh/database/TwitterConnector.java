@@ -6,11 +6,8 @@ package edu.agh.database;
 
 import edu.agh.manualutils.PrinterUtil;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.AbstractMap;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -31,14 +28,11 @@ public class TwitterConnector extends MyConnector{
             statement = connect
                 .prepareStatement("insert into Osoba(id, nazwa, link, miejsce) values (?, ?, ?, ?)");
             int index=1;
-            // "myuser, webpage, datum, summery, COMMENTS from feedback.comments");
-            // Parameters start with 1
             statement.setInt(index++, id);
             statement.setString(index++, name);
             statement.setString(index++, link);
             statement.setString(index++, place);
             statement.executeUpdate();
-            statement.close();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
         } finally {
@@ -52,15 +46,45 @@ public class TwitterConnector extends MyConnector{
             statement = connect
                 .prepareStatement("insert into Osoba(id, nazwa, link, miejsce, celebryta) values (?, ?, ?, ?, ?)");
             int index=1;
-            // "myuser, webpage, datum, summery, COMMENTS from feedback.comments");
-            // Parameters start with 1
             statement.setInt(index++, id);
             statement.setString(index++, name);
             statement.setString(index++, link);
             statement.setString(index++, place);
             statement.setBoolean(index++, celebryta);
             statement.executeUpdate();
-            statement.close();
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
+        }
+    }
+    
+    public void putTwitterMalformedUser(int id, String link) {
+        PreparedStatement statement=null;
+        try {
+            statement = connect
+                .prepareStatement("insert into Osoba(id, link, uszkodzony) values (?, ?, ?)");
+            int index=1;
+            statement.setInt(index++, id);
+            statement.setString(index++, link);
+            statement.setBoolean(index++, true);
+            statement.executeUpdate();
+        } catch (SQLException ex) {
+            Exceptions.printStackTrace(ex);
+        } finally {
+            closeStatement(statement);
+        }
+    }
+    
+    public void updateTwitterMalformedUser(int id, String link) {
+        PreparedStatement statement=null;
+        try {
+            statement = connect
+                .prepareStatement("update table Osoba set uszkodzony = ? where id = ?");
+            int index=1;
+            statement.setBoolean(index++, true);
+            statement.setInt(index++, id);
+            statement.executeUpdate();
         } catch (SQLException ex) {
             Exceptions.printStackTrace(ex);
         } finally {

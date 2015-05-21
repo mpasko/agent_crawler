@@ -26,7 +26,10 @@ public class TwitterConnectionHolder {
 
     public void relogin() {
         ConfigurationBuilder cb = new ConfigurationBuilder();
-        cb.setDebugEnabled(true).setOAuthConsumerKey(SecretProvider.CONSUMER_KEY).setOAuthConsumerSecret(SecretProvider.CONSUMER_KEY_SECRET).setOAuthAccessToken(SecretProvider.ACCESS_TOKEN).setOAuthAccessTokenSecret(SecretProvider.ACCESS_TOKEN_SECRET);
+        cb.setDebugEnabled(true).setOAuthConsumerKey(SecretProvider.CONSUMER_KEY)
+                .setOAuthConsumerSecret(SecretProvider.CONSUMER_KEY_SECRET)
+                .setOAuthAccessToken(SecretProvider.ACCESS_TOKEN)
+                .setOAuthAccessTokenSecret(SecretProvider.ACCESS_TOKEN_SECRET);
         TwitterFactory tf = new TwitterFactory(cb.build());
         twitter = tf.getInstance();
         lastLogin = DateTime.now();

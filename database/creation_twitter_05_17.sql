@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS `twitterdb`.`Osoba` (
   `link` VARCHAR(90) NULL,
   `miejsce` VARCHAR(90) NULL,
   `celebryta` BOOLEAN NULL,
+  `uszkodzony` BOOLEAN NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
 

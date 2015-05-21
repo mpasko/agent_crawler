@@ -67,9 +67,8 @@ public class TwitterCrawler {
         System.out.println("Connected to Database");
     }
 
-
     public void doJob() throws TwitterException {
-        System.out.println("Starting crawling: "+DateTime.now());
+        System.out.println("Starting crawling: " + DateTime.now());
         userId = connect.getMaxOsobaId() + 1;
 
         System.out.println("Starting with:" + userId);
@@ -194,18 +193,29 @@ public class TwitterCrawler {
         List<String> nextUsers = connect.getUsersToExamine();
         for (String screen : nextUsers) {
             holder.reloginIfNeeded();
-            User nextUser = PageableFetcher.wrapShowUser(holder, screen);
+            User nextUser;
+            try {
+                nextUser = PageableFetcher.wrapShowUser(holder, screen);
+            } catch (RuntimeException ex) {
+                connect.putTwitterMalformedUser(userId, screen);
+                throw ex;
+            }
             int followersCount = nextUser.getFollowersCount();
             int friendsCount = nextUser.getFriendsCount();
             boolean isCelebrity = (followersCount > 300) || (friendsCount > 500);
             if (!isCelebrity) {
-                examineUser(holder, nextUser);
+                try {
+                    examineUser(holder, nextUser);
+                } catch (RuntimeException ex) {
+                    connect.updateTwitterMalformedUser(userId, screen);
+                    throw ex;
+                }
             }
         }
     }
 
-
     private static enum PlaceStatus {
+
         POLAND, OUTSIDE, INVALID;
     }
 

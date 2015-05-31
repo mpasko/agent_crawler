@@ -16,18 +16,26 @@
 
     <build>
         <plugins>
-				<!--
+            <!--
+        <plugin>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>maven-bundle-plugin</artifactId>
+            <extensions>true</extensions>
+            <configuration>
+                <instructions>
+                    <Bundle-Activator>edu.agh.Activator</Bundle-Activator>
+                </instructions>
+            </configuration>
+        </plugin>
+        				-->
             <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <extensions>true</extensions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <instructions>
-                        <Bundle-Activator>edu.agh.Activator</Bundle-Activator>
-                    </instructions>
+                    <source>1.6</source>
+                    <target>1.6</target>
                 </configuration>
             </plugin>
-				-->
             <plugin>
                 <groupId>org.janus-project.maven</groupId>
                 <artifactId>janus-maven-plugin</artifactId>
@@ -54,10 +62,10 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>edu.agh.facebook.TwitterCrawler</mainClass>
+                    <mainClass>edu.agh.graph.GephiMain</mainClass>
                 </configuration>
-				<!--
-				-->
+                <!--
+            				-->
             </plugin>
         </plugins>
     </build>
@@ -88,6 +96,15 @@
             <name>Gephi Releases</name>
             <url>http://nexus.gephi.org/nexus/content/repositories/releases/</url>
         </repository>
+        <!--repository>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+            <layout>default</layout>
+            <url>http://repo1.maven.org/maven2</url>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository-->
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -110,41 +127,87 @@
             <artifactId>restfb</artifactId>
             <version>1.8.0</version>
         </dependency>
-        <dependency>
-            <groupId>org.gephi</groupId>
+        <!-->org.gephi</groupId>
             <artifactId>gephi-toolkit</artifactId>
             <version>0.9-SNAPSHOT</version>
+        </dependency-->
+        <!--dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung2</artifactId>
+            <version>2.0.1</version>
+        </dependency-->
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-graph-impl</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-algorithms</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.sf.jung</groupId>
+            <artifactId>jung-visualization</artifactId>
+            <version>2.0.1</version>
+        </dependency>
+        <dependency>
+            <artifactId>org.gephi</artifactId>
+            <groupId>gephi</groupId>
+            <version>0.8.7</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/gephi-toolkit.jar</systemPath>
         </dependency>
         <!--dependency>
-         			<groupId>org.janus-project.kernel</groupId>
-         			<artifactId>osgi</artifactId>
-         			<version>${janus.verion}</version>
+            <groupId>org.gephi</groupId>
+            <artifactId>attributes</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>graph-api</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>graphstore</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.gephi</groupId>
+            <artifactId>graphstore-api</artifactId>
+            <version>0.9-SNAPSHOT</version>
+        </dependency-->
+        <!--dependency>
+             			<groupId>org.janus-project.kernel</groupId>
+             			<artifactId>osgi</artifactId>
+             			<version>${janus.verion}</version>
       		</dependency>
       		<dependency>
-         			<groupId>org.janus-project.kernel</groupId>
-         			<artifactId>network</artifactId>
-         			<version>${janus.verion}</version>
+             			<groupId>org.janus-project.kernel</groupId>
+             			<artifactId>network</artifactId>
+             			<version>${janus.verion}</version>
       		</dependency -->
         <!-- Uncomment these dependencies if you what to use the osgi shell. Remember 
      			that if you include them they will be included in you final application distribution 
      			zip, then increasing your application footprint. -->
         <!-- 
       		<dependency>
-         			<groupId>org.apache.felix</groupId>
-         			<artifactId>org.apache.felix.gogo.command</artifactId>
-         			<version>${felix.gogo.command.version}</version>
+             			<groupId>org.apache.felix</groupId>
+             			<artifactId>org.apache.felix.gogo.command</artifactId>
+             			<version>${felix.gogo.command.version}</version>
       		</dependency>
       		<dependency>
-         			<groupId>org.apache.felix</groupId>
-         			<artifactId>org.apache.felix.gogo.shell</artifactId>
-         			<version>${felix.gogo.shell.version}</version>
+             			<groupId>org.apache.felix</groupId>
+             			<artifactId>org.apache.felix.gogo.shell</artifactId>
+             			<version>${felix.gogo.shell.version}</version>
       		</dependency>
       		-->
         <!--dependency>
-         			<groupId>org.apache.felix</groupId>
-         			<artifactId>org.apache.felix.main</artifactId>
-         			<version>${felix.main.version}</version>
-         			<scope>provided</scope>
+             			<groupId>org.apache.felix</groupId>
+             			<artifactId>org.apache.felix.main</artifactId>
+             			<version>${felix.main.version}</version>
+             			<scope>provided</scope>
       		</dependency-->
         <!--dependency>
             <groupId>org.janus-project.kernel</groupId>
@@ -191,6 +254,12 @@
             <groupId>org.twitter4j</groupId>
             <artifactId>twitter4j-core</artifactId>
             <version>4.0.3</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

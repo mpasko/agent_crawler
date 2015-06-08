@@ -38,12 +38,12 @@ public class GephiMain {
 
     public static void main(String args[]) {
         List<Entry<Integer, Integer>> edgesSource = new SampleGenerator().generate(100);
-        Map<Integer, Double> results = new GephiMain().calculateGephiMetrics(edgesSource, GraphDistance.BETWEENNESS);
+        Map<Integer, Double> results = computeBetweeness(edgesSource);
         System.out.println("Betweeness");
         for (Entry<Integer, Double> value : results.entrySet()) {
             System.out.println(value);
         }
-        results = new GephiMain().calculateGephiMetrics(edgesSource, GraphDistance.CLOSENESS);
+        results = computeCloseness(edgesSource);
         System.out.println("Closeness");
         for (Entry<Integer, Double> value : results.entrySet()) {
             System.out.println(value);
@@ -94,6 +94,17 @@ public class GephiMain {
         graph2.addNode(n1);
         graph2.addNode(n2);
         graph2.addEdge(e1);
+    }
+
+    public static Map<Integer, Double> computeBetweeness(List<Entry<Integer, Integer>> edgesSource) {
+        Map<Integer, Double> results = new GephiMain().calculateGephiMetrics(edgesSource, GraphDistance.BETWEENNESS);
+        return results;
+    }
+
+    public static Map<Integer, Double> computeCloseness(List<Entry<Integer, Integer>> edgesSource) {
+        Map<Integer, Double> results;
+        results = new GephiMain().calculateGephiMetrics(edgesSource, GraphDistance.CLOSENESS);
+        return results;
     }
 
     public Map<Integer, Double> calculateGephiMetrics(List<Entry<Integer, Integer>> edgesSource, String metric) {

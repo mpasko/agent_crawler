@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Archiver-Version: Plexus Archiver
+Created-By: Apache Maven
+Built-By: marcin
+Build-Jdk: 1.6
+Main-Class: edu.agh.controller.Interpreter
+Class-Path: lib/gephi-toolkit.jar;lib/kernel-1.0-with-dependencies

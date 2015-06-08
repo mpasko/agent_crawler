@@ -4,6 +4,7 @@
  */
 package edu.agh.facebook;
 
+import edu.agh.database.FacebookConnector;
 import edu.agh.database.MyConnector;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -52,7 +53,7 @@ public class FacebookCrawlerMain {
     List<NameValuePair> nvps;
     //Queue<String> namesToVerify;
     //Set<String> alredyVisited;
-    private final MyConnector connector;
+    private final FacebookConnector connector;
     private final Random random;
     private DateParser dateParser;
     
@@ -60,7 +61,7 @@ public class FacebookCrawlerMain {
         httpclient = new DefaultHttpClient();
         //namesToVerify = new LinkedList<String>();
         //alredyVisited = new HashSet<String>();
-        connector = new MyConnector("mydb");
+        connector = new FacebookConnector();
         random = new Random();
         dateParser = new DateParser();
     }

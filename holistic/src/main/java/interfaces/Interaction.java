@@ -1,3 +1,5 @@
+package interfaces;
+
 
 import java.util.Date;
 
@@ -10,7 +12,7 @@ import java.util.Date;
  *
  * @author marcin
  */
-class Interaction {
+public class Interaction {
     private Date date_time;
     private Integer from;
     private Integer to;

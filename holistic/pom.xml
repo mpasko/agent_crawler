@@ -35,6 +35,7 @@
                     <source>1.6</source>
                     <target>1.6</target>
                 </configuration>
+                <version>3.3</version>
             </plugin>
             <plugin>
                 <groupId>org.janus-project.maven</groupId>
@@ -62,11 +63,45 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>edu.agh.graph.GephiMain</mainClass>
+                    <mainClass>edu.agh.controller.Interpreter</mainClass>
                 </configuration>
                 <!--
             				-->
             </plugin>
+            <plugin>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr3-maven-plugin</artifactId>
+                <version>3.4</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>antlr</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <archive>
+                        <manifestFile>MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>install</phase>
+                        <goals>
+                            <goal>attached</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
         </plugins>
     </build>
 
@@ -136,6 +171,14 @@
             <artifactId>jung2</artifactId>
             <version>2.0.1</version>
         </dependency-->
+        
+        
+        <dependency>
+            <groupId>org.antlr</groupId>
+            <artifactId>antlr-runtime</artifactId>
+            <version>3.4</version>
+            <scope>compile</scope>
+        </dependency>
         <dependency>
             <groupId>net.sf.jung</groupId>
             <artifactId>jung-graph-impl</artifactId>
@@ -260,6 +303,11 @@
             <artifactId>junit</artifactId>
             <version>4.10</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>2.12.1</version>
         </dependency>
     </dependencies>
 </project>

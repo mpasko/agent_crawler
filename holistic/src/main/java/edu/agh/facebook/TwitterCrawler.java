@@ -6,10 +6,8 @@ package edu.agh.facebook;
 
 import edu.agh.database.TwitterConnector;
 import edu.agh.twitter.PageableFetcher;
-import edu.agh.twitter.SecretProvider;
 import edu.agh.twitter.SimpleFetcher;
 import edu.agh.twitter.TwitterConnectionHolder;
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
@@ -17,20 +15,16 @@ import org.joda.time.DateTime;
 import org.openide.util.Exceptions;
 import twitter4j.GeoLocation;
 import twitter4j.GeoQuery;
-import twitter4j.IDs;
 import twitter4j.PagableResponseList;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.SymbolEntity;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
 import twitter4j.URLEntity;
 import twitter4j.User;
 import twitter4j.UserList;
 import twitter4j.UserMentionEntity;
-import twitter4j.auth.AccessToken;
-import twitter4j.conf.ConfigurationBuilder;
 
 /**
  *

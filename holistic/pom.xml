@@ -16,18 +16,6 @@
 
     <build>
         <plugins>
-            <!--
-        <plugin>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>maven-bundle-plugin</artifactId>
-            <extensions>true</extensions>
-            <configuration>
-                <instructions>
-                    <Bundle-Activator>edu.agh.Activator</Bundle-Activator>
-                </instructions>
-            </configuration>
-        </plugin>
-        				-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -80,28 +68,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <archive>
-                        <manifestFile>MANIFEST.MF</manifestFile>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>attached</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
         </plugins>
     </build>
 
@@ -131,15 +97,6 @@
             <name>Gephi Releases</name>
             <url>http://nexus.gephi.org/nexus/content/repositories/releases/</url>
         </repository>
-        <!--repository>
-            <id>central</id>
-            <name>Maven Repository Switchboard</name>
-            <layout>default</layout>
-            <url>http://repo1.maven.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository-->
     </repositories>
     <pluginRepositories>
         <pluginRepository>
@@ -161,17 +118,7 @@
             <groupId>com.restfb</groupId>
             <artifactId>restfb</artifactId>
             <version>1.8.0</version>
-        </dependency>
-        <!-->org.gephi</groupId>
-            <artifactId>gephi-toolkit</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency-->
-        <!--dependency>
-            <groupId>net.sf.jung</groupId>
-            <artifactId>jung2</artifactId>
-            <version>2.0.1</version>
-        </dependency-->
-        
+        </dependency>        
         
         <dependency>
             <groupId>org.antlr</groupId>
@@ -201,69 +148,6 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/gephi-toolkit.jar</systemPath>
         </dependency>
-        <!--dependency>
-            <groupId>org.gephi</groupId>
-            <artifactId>attributes</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gephi</groupId>
-            <artifactId>graph-api</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gephi</groupId>
-            <artifactId>graphstore</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.gephi</groupId>
-            <artifactId>graphstore-api</artifactId>
-            <version>0.9-SNAPSHOT</version>
-        </dependency-->
-        <!--dependency>
-             			<groupId>org.janus-project.kernel</groupId>
-             			<artifactId>osgi</artifactId>
-             			<version>${janus.verion}</version>
-      		</dependency>
-      		<dependency>
-             			<groupId>org.janus-project.kernel</groupId>
-             			<artifactId>network</artifactId>
-             			<version>${janus.verion}</version>
-      		</dependency -->
-        <!-- Uncomment these dependencies if you what to use the osgi shell. Remember 
-     			that if you include them they will be included in you final application distribution 
-     			zip, then increasing your application footprint. -->
-        <!-- 
-      		<dependency>
-             			<groupId>org.apache.felix</groupId>
-             			<artifactId>org.apache.felix.gogo.command</artifactId>
-             			<version>${felix.gogo.command.version}</version>
-      		</dependency>
-      		<dependency>
-             			<groupId>org.apache.felix</groupId>
-             			<artifactId>org.apache.felix.gogo.shell</artifactId>
-             			<version>${felix.gogo.shell.version}</version>
-      		</dependency>
-      		-->
-        <!--dependency>
-             			<groupId>org.apache.felix</groupId>
-             			<artifactId>org.apache.felix.main</artifactId>
-             			<version>${felix.main.version}</version>
-             			<scope>provided</scope>
-      		</dependency-->
-        <!--dependency>
-            <groupId>org.janus-project.kernel</groupId>
-            <artifactId>osgi</artifactId>
-            <version>0.3</version>
-            <type>jar</type>
-            <exclusions>
-                <exclusion>
-                    <artifactId>arakhneVmutils</artifactId>
-                    <groupId>org.arakhne.afc</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency-->
         <dependency>
             <groupId>org.janus-project.kernel</groupId>
             <artifactId>osgi</artifactId>
@@ -308,6 +192,12 @@
             <groupId>jline</groupId>
             <artifactId>jline</artifactId>
             <version>2.12.1</version>
+        </dependency>
+        <dependency>
+          <groupId>org.easymock</groupId>
+          <artifactId>easymock</artifactId>
+          <version>3.3.1</version>
+          <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

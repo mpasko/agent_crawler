@@ -95,12 +95,8 @@ public class FacebookCrawlerMain {
         }
         httpost = new HttpPost("http://www.facebook.com/login.php");
         nvps = new ArrayList<NameValuePair>();
-		/*
-        nvps.add(new BasicNameValuePair("email", "krismiechowski333@gmail.com"));
-        nvps.add(new BasicNameValuePair("pass", "kmiechowski333"));
-		*/
-		nvps.add(new BasicNameValuePair("email", "a2686248@trbvm.com"));
-        nvps.add(new BasicNameValuePair("pass", "cheos2"));
+		nvps.add(new BasicNameValuePair("email", "xxxxxxxx@xxxxxx.xx"));
+        nvps.add(new BasicNameValuePair("pass", "xxxxxxxxx"));
 		
         entity.getContent().close();
         httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));

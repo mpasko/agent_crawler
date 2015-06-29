@@ -59,12 +59,12 @@ public class GephiMainTest {
         assertEquals(result.get(4), result.get(2));
     }
 
-    public void putTestEdge(List<Entry<Integer, Integer>> edgesSource, Integer from, Integer to) {
+    public static void putTestEdge(List<Entry<Integer, Integer>> edgesSource, Integer from, Integer to) {
         edgesSource.add(new AbstractMap.SimpleEntry<Integer, Integer>(from, to));
         edgesSource.add(new AbstractMap.SimpleEntry<Integer, Integer>(to, from));
     }
 
-    public List<Entry<Integer, Integer>> generateTestGraph() {
+    public static List<Entry<Integer, Integer>> generateTestGraph() {
         List<Entry<Integer, Integer>> edgesSource = new LinkedList<Entry<Integer, Integer>>();
         putTestEdge(edgesSource, 0, 1);
         putTestEdge(edgesSource, 0, 2);

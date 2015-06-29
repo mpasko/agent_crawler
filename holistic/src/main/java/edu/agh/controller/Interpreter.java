@@ -5,11 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import jline.Terminal;
-import jline.TerminalFactory;
-import jline.console.ConsoleReader;
 import org.antlr.runtime.tree.CommonTree;
-import org.antlr.runtime.tree.Tree;
 import org.openide.util.Exceptions;
 
 /*

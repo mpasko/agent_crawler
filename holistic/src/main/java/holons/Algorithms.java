@@ -2,8 +2,9 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package edu.agh.controller;
+package holons;
 
+import edu.agh.controller.*;
 import edu.agh.database.TwitterConnector;
 import edu.agh.graph.GephiMain;
 import edu.agh.graph.JungMain;
@@ -13,6 +14,7 @@ import interfaces.Cache;
 import interfaces.IDataSource;
 import interfaces.PersonGroup;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -26,18 +28,18 @@ import java.util.Map.Entry;
  *
  * @author marcin
  */
-public class Controller {
+public class Algorithms {
 
     public static final double EPSILON = 0.0000001;
     private final IDataSource dataSource;
 
     //public List<Map.Entry<Integer, Integer>> edgesSource;
-    public Controller() {
+    public Algorithms() {
         //edgesSource = new SampleGenerator().generate(100);
         dataSource = new Cache(new TwitterConnector());
     }
     
-    public Controller(IDataSource source) {
+    public Algorithms(IDataSource source) {
         dataSource = source;
     }
 
@@ -222,6 +224,32 @@ public class Controller {
             Map<Integer, Double> eigenvector = JungMain.computeEigenvector(graph);
             String metric = "eigenvector";
             printAllMetrics(eigenvector, metric);
+        } else {
+            System.out.println(String.format("Group '%s' not found!", nick));
+        }
+    }
+
+    public void cohesionByGroup(String nick) {
+        PersonGroup foundGroup = findGroupByNick(nick);
+        if (foundGroup != null) {
+            List<Entry<Integer, Integer>> filtered = filterEdgegsByMembership(dataSource.getListOfLinks(), foundGroup.getMembers());
+            Graph<Integer, String> graph = JungMain.generateGraphFromSources(filtered);
+            Map<Integer, Double> cohesion = JungMain.computeEigenvector(graph);
+            String metric = "cohesion";
+            printAllMetrics(cohesion, metric);
+        } else {
+            System.out.println(String.format("Group '%s' not found!", nick));
+        }
+    }
+
+    public void densityByGroup(String nick) {
+        PersonGroup foundGroup = findGroupByNick(nick);
+        if (foundGroup != null) {
+            List<Entry<Integer, Integer>> filtered = filterEdgegsByMembership(dataSource.getListOfLinks(), foundGroup.getMembers());
+            Graph<Integer, String> graph = JungMain.generateGraphFromSources(filtered);
+            Map<Integer, Double> density = JungMain.computeEigenvector(graph);
+            String metric = "density";
+            printAllMetrics(density, metric);
         } else {
             System.out.println(String.format("Group '%s' not found!", nick));
         }
